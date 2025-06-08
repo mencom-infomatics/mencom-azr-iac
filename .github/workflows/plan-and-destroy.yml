@@ -1,0 +1,78 @@
+name: "Terraform Plan & Destroy"
+run-name: "Plan & Destroy: ${{ github.event.inputs.module }}, Environment: ${{ github.event.inputs.environment }}, Branch: ${{ github.ref }}"
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: "Name of the module to run"
+        type: choice
+        options:
+          - "monitor"
+
+      environment:
+        description: "Select environment"
+        default: dev
+        type: choice
+        options:
+          - dev
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  terraform_version: "1.12.1"
+
+jobs:
+  plan-and-destroy:
+    name: "Terraform Plan & Destroy"
+    runs-on: ubuntu-24.04
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.ARM_CLIENT_CERTIFICATE_PASSWORD }}
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: "Checkout To branch: ${{ github.ref_name }}"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Write Certificate File
+      - name: Write certificate file
+        run: |
+          echo "${{ secrets.ARM_CLIENT_CERTIFICATE_CONTENT }}" | base64 -d > client.pfx
+          echo "ARM_CLIENT_CERTIFICATE_PATH=${{ github.workspace }}/client.pfx" >> $GITHUB_ENV
+
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.terraform_version }}
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        working-directory: "./infrastructure/${{ github.event.inputs.module }}"
+        run: |
+          echo "Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc."
+          terraform init -backend-config=environment/${{ github.event.inputs.environment }}/.tfbackend
+
+      # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        working-directory: "./infrastructure/${{ github.event.inputs.module }}"
+        run: |
+          echo "Generates an execution plan for Terraform"
+          terraform plan -destroy -var-file=environment/${{ github.event.inputs.environment }}/.tfvars -input=false
+
+      # On running from main branch only
+      - name: Terraform Destroy
+        working-directory: "./infrastructure/${{ github.event.inputs.module }}"
+        run: |
+          terraform apply -destroy -auto-approve -var-file=environment/${{ github.event.inputs.environment }}/.tfvars -input=false
