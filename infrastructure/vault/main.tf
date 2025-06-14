@@ -49,3 +49,42 @@ resource "azurerm_role_assignment" "kv_admin_role_assignment" {
     azurerm_key_vault.this
   ]
 }
+
+resource "azurerm_private_endpoint" "kv_pe" {
+  name                = "${local.kv_name}-pe"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  subnet_id           = module.kv_subnet.subnet_id
+
+  private_service_connection {
+    name                           = "${local.kv_name}-private-connection"
+    private_connection_resource_id = azurerm_key_vault.this.id
+    is_manual_connection           = false
+    subresource_names              = ["vault"]
+  }
+
+  depends_on = [
+    azurerm_key_vault.this
+  ]
+}
+
+resource "azurerm_private_dns_zone" "kv_dns_zone" {
+  name                = "privatelink.vault.azure.net"
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_private_dns_a_record" "example" {
+  name                = local.kv_name
+  zone_name           = azurerm_private_dns_zone.kv_dns_zone.name
+  resource_group_name = azurerm_resource_group.this.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.kv_pe.private_ip_address]
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "example" {
+  name                  = "${local.kv_name}-dns-link"
+  resource_group_name   = azurerm_resource_group.this.name
+  private_dns_zone_name = azurerm_private_dns_zone.kv_dns_zone.name
+  virtual_network_id    = data.azurerm_virtual_network.vnet.id
+  depends_on            = [azurerm_private_endpoint.kv_pe]
+}
