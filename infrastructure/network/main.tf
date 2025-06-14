@@ -27,7 +27,8 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
   # Replace the below category with one available for Virtual Network if needed.
 
   enabled_log {
-    category_group = "VMProtectionAlerts"
+    category       = "VMProtectionAlerts"
+    category_group = "allLogs"
   }
 
   # The metric block configures metrics collection.
