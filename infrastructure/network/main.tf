@@ -28,7 +28,6 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
 
   enabled_log {
     category       = "VMProtectionAlerts"
-    category_group = "allLogs"
   }
 
   # The metric block configures metrics collection.
