@@ -73,7 +73,7 @@ resource "azurerm_private_dns_zone" "kv_dns_zone" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
-resource "azurerm_private_dns_a_record" "example" {
+resource "azurerm_private_dns_a_record" "kv_dns_a_record" {
   name                = local.kv_name
   zone_name           = azurerm_private_dns_zone.kv_dns_zone.name
   resource_group_name = azurerm_resource_group.this.name
@@ -81,7 +81,7 @@ resource "azurerm_private_dns_a_record" "example" {
   records             = [azurerm_private_endpoint.kv_pe.private_ip_address]
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "example" {
+resource "azurerm_private_dns_zone_virtual_network_link" "kv_dns_zone_vnet_link" {
   name                  = "${local.kv_name}-dns-link"
   resource_group_name   = azurerm_resource_group.this.name
   private_dns_zone_name = azurerm_private_dns_zone.kv_dns_zone.name
