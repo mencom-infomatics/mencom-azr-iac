@@ -4,9 +4,13 @@ resource "azurerm_resource_group" "network" {
 }
 
 resource "azurerm_virtual_network" "virtual_network" {
-  name                = local.vnet_name
+  name                = local.virtual_network_name
   location            = azurerm_resource_group.network.location
   resource_group_name = azurerm_resource_group.network.name
+  address_space       = var.vnet_address_spaces
 
-  address_space = ["10.0.0.0/16"]
+  tags = {
+    environment = var.environment
+    location    = var.location
+  }
 }
