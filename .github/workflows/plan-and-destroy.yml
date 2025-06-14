@@ -9,6 +9,7 @@ on:
         options:
           - "monitor"
           - "network"
+          - "vault"
 
       environment:
         description: "Select environment"
