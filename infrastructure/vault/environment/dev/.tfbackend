@@ -1,4 +1,4 @@
 resource_group_name  = "mcm-shared-rsg"
 storage_account_name = "mcmcussharedstore"
 container_name       = "mcm-dev-tfstate-container"
-key                  = "mcm-dev-cus-base.tfstate"
+key                  = "mcm-dev-cus.vault.tfstate"
