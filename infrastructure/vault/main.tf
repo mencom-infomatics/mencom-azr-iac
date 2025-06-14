@@ -78,7 +78,7 @@ resource "azurerm_private_dns_a_record" "kv_dns_a_record" {
   zone_name           = azurerm_private_dns_zone.kv_dns_zone.name
   resource_group_name = azurerm_resource_group.this.name
   ttl                 = 300
-  records             = [azurerm_private_endpoint.kv_pe.private_ip_address]
+  records             = [azurerm_private_endpoint.kv_pe.private_service_connection[0].private_ip_address]
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "kv_dns_zone_vnet_link" {
