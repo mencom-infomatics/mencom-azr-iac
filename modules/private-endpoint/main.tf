@@ -16,7 +16,7 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   }
 }
 
-resource "null_resource" "dns_query" {
+resource "null_resource" "dns_query_check" {
   provisioner "local-exec" {
     when       = create
     on_failure = continue

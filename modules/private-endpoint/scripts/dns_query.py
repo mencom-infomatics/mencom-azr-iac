@@ -78,7 +78,7 @@ def dns_nslookup(fqdn: str, private_ip_list: list):
                     break
                 
                 else:
-                    dns_msg("No Exception has occurred, DNS record has not been created yet")
+                    dns_msg("No Exception has occurred", "DNS record has not been created yet")
                     dns_sleep(5)
                     continue
                 
