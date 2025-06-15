@@ -1,22 +1,4 @@
-output "subnet_id" {
+output "private_endpoint_ip" {
   description = "The ID of the subnet."
-  value       = azurerm_subnet.this.id
-}
-
-output "subnet_name" {
-  description = "The name of the subnet."
-  value       = azurerm_subnet.this.name
-}
-
-output "subnet_address_prefixes" {
-  description = "The address prefixes of the subnet."
-  value       = azurerm_subnet.this.address_prefixes
-}
-
-output "nsg" {
-  description = "All outputs from the NSG module"
-  value = {
-    id   = module.subnet_nsg.nsg_id
-    name = module.subnet_nsg.nsg_name
-  }
+  value       = data.azurerm_network_interface.this.ip_configuration[*].private_ip_address
 }
