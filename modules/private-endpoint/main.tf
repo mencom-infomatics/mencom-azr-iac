@@ -2,6 +2,17 @@ locals {
   fqdn = "${var.private_connection_resource_name}.${var.private_dns_zone_id}"
 }
 
+data "azurerm_private_dns_zone" "global_zone" {
+  name                = var.private_dns_zone_id
+  resource_group_name = var.global_resource_group_name
+}
+
+data "azurerm_network_interface" "this" {
+  resource_group_name = var.resource_group_name
+  name                = azurerm_private_endpoint.private_endpoint.network_interface[0].name
+  depends_on          = [azurerm_private_endpoint.private_endpoint]
+}
+
 resource "azurerm_private_endpoint" "private_endpoint" {
   name                = var.private_endpoint_name
   location            = var.location
@@ -11,13 +22,8 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   private_service_connection {
     name                           = var.private_endpoint_name
     private_connection_resource_id = var.private_connection_resource_id
-    is_manual_connection           = false
     subresource_names              = var.subresource_names
-  }
-
-  private_dns_zone_group {
-    name                 = var.private_endpoint_name
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.global_zone.id]
+    is_manual_connection           = false
   }
 
   lifecycle {
@@ -25,21 +31,17 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   }
 }
 
-# DNS query check with 
-# resource "null_resource" "dns_query" {
-#   provisioner "local-exec" {
-#     when       = create
-#     on_failure = continue
-#     command    = <<EOT
-#       /usr/bin/python3 -u ${path.module}/scripts/dns_query.py --private_ip ${jsonencode(join(", ", data.azurerm_network_interface.this.ip_configuration[*].private_ip_address))} --fqdn ${local.fqdn} --time-out ${var.dns_script_timeout}
-#       EOT
-#   }
+resource "azurerm_private_dns_zone_virtual_network_link" "private_endpoint_link" {
+  name                  = "${var.private_endpoint_name}-link"
+  resource_group_name   = var.global_resource_group_name
+  private_dns_zone_name = data.azurerm_private_dns_zone.global_zone.name
+  virtual_network_id    = var.virtual_network_id
+}
 
-#   triggers = {
-#     private_endpoint_id = azurerm_private_endpoint.private_endpoint.id
-#   }
-
-#   depends_on = [
-#     azurerm_private_endpoint.private_endpoint
-#   ]
-# }
+resource "azurerm_private_dns_a_record" "example" {
+  name                = "${var.private_endpoint_name}-a-record"
+  zone_name           = data.azurerm_private_dns_zone.global_zone.name
+  resource_group_name = var.global_resource_group_name
+  records             = [data.azurerm_network_interface.this.private_ip_address]
+  ttl                 = 600
+}

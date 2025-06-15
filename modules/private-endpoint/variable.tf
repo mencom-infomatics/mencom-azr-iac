@@ -30,6 +30,10 @@ variable "private_connection_resource_name" {
   type = string
 }
 
+variable "virtual_network_id" {
+  type = string
+}
+
 variable "dns_script_timeout" {
   type    = number
   default = 900
