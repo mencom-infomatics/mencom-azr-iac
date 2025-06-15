@@ -34,3 +34,7 @@ variable "dns_script_timeout" {
   type    = number
   default = 900
 }
+
+variable "global_resource_group_name" {
+  type = string
+}

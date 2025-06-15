@@ -9,6 +9,7 @@ locals {
 
   network_rsg_name = lower("${local.name_prefix}-network-rsg")
   vnet_name        = lower("${local.name_prefix}-vnet")
+  global_rsg_name  = lower("${var.team}-shared-rsg")
 
   # Vault Resources
   vault_rsg_name = lower("${local.name_prefix}-vault-rsg")

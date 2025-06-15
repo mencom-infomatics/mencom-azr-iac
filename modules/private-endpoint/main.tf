@@ -1,3 +1,7 @@
+locals {
+  fqdn = "${var.private_connection_resource_name}.${var.private_dns_zone_id}"
+}
+
 resource "azurerm_private_endpoint" "private_endpoint" {
   name                = var.private_endpoint_name
   location            = var.location
@@ -11,25 +15,31 @@ resource "azurerm_private_endpoint" "private_endpoint" {
     subresource_names              = var.subresource_names
   }
 
+  private_dns_zone_group {
+    name                 = var.private_endpoint_name
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.global_zone.id]
+  }
+
   lifecycle {
     ignore_changes = [private_dns_zone_group]
   }
 }
 
-resource "null_resource" "dns_query_check" {
-  provisioner "local-exec" {
-    when       = create
-    on_failure = continue
-    command    = <<EOT
-      /usr/bin/python3 -u ${path.module}/scripts/dns_query.py --private_ip ${jsonencode(join(", ", data.azurerm_network_interface.this.ip_configuration[*].private_ip_address))} --fqdn ${local.fqdn} --time-out ${var.dns_script_timeout}
-      EOT
-  }
+# DNS query check with 
+# resource "null_resource" "dns_query" {
+#   provisioner "local-exec" {
+#     when       = create
+#     on_failure = continue
+#     command    = <<EOT
+#       /usr/bin/python3 -u ${path.module}/scripts/dns_query.py --private_ip ${jsonencode(join(", ", data.azurerm_network_interface.this.ip_configuration[*].private_ip_address))} --fqdn ${local.fqdn} --time-out ${var.dns_script_timeout}
+#       EOT
+#   }
 
-  triggers = {
-    private_endpoint_id = azurerm_private_endpoint.private_endpoint.id
-  }
+#   triggers = {
+#     private_endpoint_id = azurerm_private_endpoint.private_endpoint.id
+#   }
 
-  depends_on = [
-    azurerm_private_endpoint.private_endpoint
-  ]
-}
+#   depends_on = [
+#     azurerm_private_endpoint.private_endpoint
+#   ]
+# }

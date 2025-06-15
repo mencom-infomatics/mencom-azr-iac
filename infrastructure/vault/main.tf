@@ -62,6 +62,7 @@ module "kv_private_endpoint" {
   private_connection_resource_name = azurerm_key_vault.this.name
   resource_group_name              = azurerm_resource_group.this.name
   location                         = azurerm_resource_group.this.location
+  global_resource_group_name       = local.global_rsg_name
 
   subnet_id                      = module.kv_subnet.subnet_id
   private_connection_resource_id = azurerm_key_vault.this.id

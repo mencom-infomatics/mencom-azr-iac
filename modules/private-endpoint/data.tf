@@ -1,3 +1,8 @@
+data "azurerm_private_dns_zone" "global_zone" {
+  name                = var.private_dns_zone_id
+  resource_group_name = var.global_resource_group_name
+}
+
 data "azurerm_network_interface" "this" {
   resource_group_name = var.resource_group_name
   name                = azurerm_private_endpoint.private_endpoint.network_interface[0].name
