@@ -14,10 +14,6 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   lifecycle {
     ignore_changes = [private_dns_zone_group]
   }
-
-  depends_on = [
-    azurerm_key_vault.this
-  ]
 }
 
 resource "null_resource" "dns_query" {
