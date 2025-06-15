@@ -68,17 +68,17 @@ jobs:
         working-directory: "./infrastructure/${{ github.event.inputs.module }}"
         run: |
           echo "Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc."
-          terraform init -backend-config=environment/${{ github.event.inputs.environment }}/.tfbackend
+          terraform init -backend-config=environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfbackend
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         working-directory: "./infrastructure/${{ github.event.inputs.module }}"
         run: |
           echo "Generates an execution plan for Terraform"
-          terraform plan -var-file=environment/${{ github.event.inputs.environment }}/.tfvars -input=false
+          terraform plan -var-file=environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars -input=false
 
       # On running from main branch only
       - name: Terraform Apply
         working-directory: "./infrastructure/${{ github.event.inputs.module }}"
         run: |
-          terraform apply -auto-approve -var-file=environment/${{ github.event.inputs.environment }}/.tfvars -input=false
+          terraform apply -auto-approve -var-file=environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars -input=false

@@ -10,10 +10,6 @@ variable "subresource_names" {
   type = list(string)
 }
 
-variable "private_endpoint_name" {
-  type = string
-}
-
 variable "resource_group_name" {
   type = string
 }

@@ -2,6 +2,22 @@
 
 Mencom Informatics Azure IAC (Infrastructure as Code) Project
 
+### Run Terraform Locally (Run from the infrastructure module folder)
+
+```
+
+For Applying
+
+terraform init -backend-config=environment/dev/dev.tfbackend
+terraform plan -var-file=environment/dev/dev.tfvars -input=false
+terraform apply -auto-approve -var-file=environment/dev/dev.tfvars -input=false
+
+For destroying
+
+terraform apply -destroy -auto-approve -var-file=environment/dev/dev.tfvars -input=false
+
+```
+
 ### Run workflow with github cli: plan-and-apply.yml
 
 ```

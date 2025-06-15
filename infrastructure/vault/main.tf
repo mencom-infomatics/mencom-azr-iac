@@ -57,8 +57,7 @@ resource "azurerm_role_assignment" "kv_admin_role_assignment" {
 
 module "kv_private_endpoint" {
   source = "../../modules/private-endpoint"
-
-  private_endpoint_name            = local.kv_pe_name
+  
   private_connection_resource_name = azurerm_key_vault.this.name
   resource_group_name              = azurerm_resource_group.this.name
   location                         = azurerm_resource_group.this.location
