@@ -7,7 +7,7 @@ resource "azurerm_subnet" "this" {
 }
 
 module "subnet_nsg" {
-  source = "../nsg"
+  source = "../network-security-group"
 
   subnet_name          = azurerm_subnet.this.name
   resource_group_name  = data.azurerm_resource_group.network_rsg.name

@@ -1,0 +1,2 @@
+dnspython
+wrapt-timeout-decorator

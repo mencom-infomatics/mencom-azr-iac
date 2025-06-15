@@ -14,7 +14,6 @@ locals {
   vault_rsg_name = lower("${local.name_prefix}-vault-rsg")
   kv_name        = lower("${local.name_prefix}-kv")
   kv_subnet_name = lower("${local.name_prefix}-kv-snet")
-  kv_pe_name     = lower("${local.name_prefix}-kv-pe")
-  kv_dns_link    = lower("${local.name_prefix}-kv-dns-link")
+  kv_pe_name     = lower("${local.name_prefix}-kv-private-endpoint")
 
 }

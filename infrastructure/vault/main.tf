@@ -55,43 +55,21 @@ resource "azurerm_role_assignment" "kv_admin_role_assignment" {
   ]
 }
 
-resource "azurerm_private_endpoint" "kv_pe" {
-  name                = "${local.kv_name}-private-endpoint"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  subnet_id           = module.kv_subnet.subnet_id
+module "kv_private_endpoint" {
+  source = "../../modules/private-endpoint"
 
-  private_service_connection {
-    name                           = "${local.kv_name}-private-connection"
-    private_connection_resource_id = azurerm_key_vault.this.id
-    is_manual_connection           = false
-    subresource_names              = ["Vault"]
-  }
+  private_endpoint_name            = local.kv_pe_name
+  private_connection_resource_name = azurerm_key_vault.this.name
+  resource_group_name              = azurerm_resource_group.this.name
+  location                         = azurerm_resource_group.this.location
+
+  subnet_id                      = module.kv_subnet.subnet_id
+  private_connection_resource_id = azurerm_key_vault.this.id
+  private_dns_zone_id            = "privatelink.vaultcore.azure.net"
+  subresource_names              = ["Vault"]
 
   depends_on = [
-    azurerm_key_vault.this
+    azurerm_key_vault.this,
+    module.kv_subnet
   ]
-}
-
-resource "azurerm_private_dns_zone" "kv_dns_zone" {
-  name                = "${local.kv_name}.privatelink.vaultcore.azure.net"
-  resource_group_name = azurerm_resource_group.this.name
-}
-
-resource "azurerm_private_dns_a_record" "kv_dns_a_record" {
-  name                = local.kv_name
-  zone_name           = azurerm_private_dns_zone.kv_dns_zone.name
-  resource_group_name = azurerm_resource_group.this.name
-  ttl                 = 300
-  records = [
-    azurerm_private_endpoint.kv_pe.private_service_connection[0].private_ip_address
-  ]
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "kv_dns_zone_vnet_link" {
-  name                  = "${local.kv_name}-vnet-dns-link"
-  resource_group_name   = azurerm_resource_group.this.name
-  private_dns_zone_name = azurerm_private_dns_zone.kv_dns_zone.name
-  virtual_network_id    = data.azurerm_virtual_network.vnet.id
-  depends_on            = [azurerm_private_endpoint.kv_pe]
 }

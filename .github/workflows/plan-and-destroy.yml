@@ -59,6 +59,10 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
+      - name: Install Python packages
+        run: |
+          pip3 install --ignore-installed "pywinrm>=0.3.0" coverage wrapt-timeout-decorator dnspython
+
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         working-directory: "./infrastructure/${{ github.event.inputs.module }}"
