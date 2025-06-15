@@ -32,14 +32,14 @@ resource "azurerm_private_endpoint" "private_endpoint" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "private_endpoint_link" {
-  name                  = "${var.private_endpoint_name}-link"
+  name                  = var.private_endpoint_name
   resource_group_name   = var.global_resource_group_name
   private_dns_zone_name = data.azurerm_private_dns_zone.global_zone.name
   virtual_network_id    = var.virtual_network_id
 }
 
 resource "azurerm_private_dns_a_record" "example" {
-  name                = "${var.private_endpoint_name}-a-record"
+  name                = var.private_endpoint_name
   zone_name           = data.azurerm_private_dns_zone.global_zone.name
   resource_group_name = var.global_resource_group_name
   records             = [data.azurerm_network_interface.this.private_ip_address]
