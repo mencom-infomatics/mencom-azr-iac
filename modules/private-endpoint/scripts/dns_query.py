@@ -131,7 +131,7 @@ if __name__ == "__main__":
     fqdn = args.fqdn
     private_ip = args.private_ip
     script_timeout_seconds = args.timeout
-    ip_regex = '(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
+    ip_regex = '(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
     
     private_ip_list = re.findall(ip_regex, private_ip)
     
